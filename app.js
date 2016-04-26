@@ -31,6 +31,7 @@ passport.use(new LinkedInStrategy({
   clientSecret: process.env.LINKEDIN_SECRET,
   callbackURL: process.env.HOST + "/auth/linkedin/callback",
   scope: ['r_emailaddress', 'r_basicprofile'],
+  state: true,
 }, function(accessToken, refreshToken, profile, done) {
   // asynchronous verification, for effect...
   process.nextTick(function () {
@@ -43,7 +44,7 @@ passport.use(new LinkedInStrategy({
 }));
 
 app.get('/auth/linkedin',
-  passport.authenticate('linkedin', { state: 'SOME STATE'  }),
+  passport.authenticate('linkedin'),
   function(req, res){
     // The request will be redirected to LinkedIn for authentication, so this
     // function will not be called.
