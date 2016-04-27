@@ -52,8 +52,13 @@ app.get('/auth/linkedin',
 app.get('/auth/linkedin/callback',
   passport.authenticate('linkedin', {
     successRedirect: '/',
-    failureRedirect: '/login'
+    failureRedirect: '/'
 }));
+
+app.get('/logout', function(req, res) {
+  req.session = null;
+  res.redirect('/');
+  });
 
 passport.serializeUser(function(user, done) {
   done(null, user);
