@@ -21,16 +21,16 @@ app.set('view engine', 'hbs');
 // uncomment after placing your favicon in /public
 //app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
 app.use(logger('dev'));
+app.use(express.static(path.join(__dirname, 'public')));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
-app.use(passport.initialize());
-app.use(passport.session());
 app.use(cookieParser());
-app.use(express.static(path.join(__dirname, 'public')));
 app.use(cookieSession({
   name: 'session',
   keys: [process.env.SESSION_KEY]
 }));
+app.use(passport.initialize());
+app.use(passport.session());
 
 passport.use(new LinkedInStrategy({
   clientID: process.env.LINKEDIN_CLIENT_ID,
@@ -47,12 +47,12 @@ app.get('/auth/linkedin',
   function(req, res){
     // The request will be redirected to LinkedIn for authentication, so this
     // function will not be called.
-  });
+});
 
 app.get('/auth/linkedin/callback',
   passport.authenticate('linkedin', {
     successRedirect: '/',
-    failureRedirect: '/'
+    failureRedirect: '/login'
 }));
 
 passport.serializeUser(function(user, done) {
@@ -63,6 +63,10 @@ passport.deserializeUser(function(user, done) {
   done(null, user)
 });
 
+app.use(function(req, res, next) {
+  res.locals.user = req.user
+  next();
+});
 app.use('/', routes);
 app.use('/users', users);
 
