@@ -55,10 +55,10 @@ app.get('/auth/linkedin/callback',
     failureRedirect: '/'
 }));
 
-app.get('/logout', function(req, res) {
-  req.session = null;
+app.get('/logout', function(req, res){
+  req.logout();
   res.redirect('/');
-  });
+});
 
 passport.serializeUser(function(user, done) {
   done(null, user);
