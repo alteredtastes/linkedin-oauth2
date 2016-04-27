@@ -24,11 +24,12 @@ app.use(logger('dev'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(passport.initialize());
+app.use(passport.session());
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(cookieSession({
   name: 'session',
-  keys: process.env.SESSION_KEY
+  keys: [process.env.SESSION_KEY]
 }));
 
 passport.use(new LinkedInStrategy({
@@ -38,14 +39,7 @@ passport.use(new LinkedInStrategy({
   scope: ['r_emailaddress', 'r_basicprofile'],
   state: true,
 }, function(accessToken, refreshToken, profile, done) {
-  // asynchronous verification, for effect...
-  process.nextTick(function () {
-    // To keep the example simple, the user's LinkedIn profile is returned to
-    // represent the logged-in user. In a typical application, you would want
-    // to associate the LinkedIn account with a user record in your database,
-    // and return that user instead.
-    return done(null, profile);
-  });
+    done(null, {id: profile.id, displayName: profile.displayName})
 }));
 
 app.get('/auth/linkedin',
@@ -58,7 +52,7 @@ app.get('/auth/linkedin',
 app.get('/auth/linkedin/callback',
   passport.authenticate('linkedin', {
     successRedirect: '/',
-    failureRedirect: '/login'
+    failureRedirect: '/'
 }));
 
 passport.serializeUser(function(user, done) {
